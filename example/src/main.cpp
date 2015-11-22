@@ -22,13 +22,14 @@ class ofApp : public ofBaseApp{
     ofParameter<ofVec3f> ambMat;
 
 	void setup(){
+        ofSetVerticalSync(false);
 		vector<string> shaders = shader.load("shader.glsl");
         pass = shader.active(shaders,440);
 
         gui.setup();
         gui.add(levelInner.set("level inner", 1, 1, 8));
         gui.add(levelOuter.set("level outer", 1, 1, 8));
-        gui.add(lightpos.set("light pos",      ofVec3f(0.),                 ofVec3f(0.), ofVec3f(50.)));
+        gui.add(lightpos.set("light pos",      ofVec3f(30.,24.,0.),         ofVec3f(0.), ofVec3f(50.)));
         gui.add(diffMat.set("diffuse material",ofVec3f(0.04f, 0.04f, 0.04f),ofVec3f(0.), ofVec3f(1.)));
         gui.add(ambMat.set("ambient material", ofVec3f(0, 0.75, 0.75),      ofVec3f(0.), ofVec3f(1.)));
 
@@ -41,7 +42,7 @@ class ofApp : public ofBaseApp{
 	}
 
 	void update(){
-
+        ofSetWindowTitle(ofToString(ofGetFrameRate()));
 	}
 
 	void draw(){
@@ -49,12 +50,15 @@ class ofApp : public ofBaseApp{
         cam.begin();
         ofEnableDepthTest();
         pass.begin();
+        ofMatrix4x4 camdist;
+        camdist.preMultTranslate(ofVec3f(0,0,600));
 
         pass.setUniform3f("LightPosition",lightpos->x,lightpos->y,lightpos->z);
         pass.setUniform3f("DiffuseMaterial",diffMat->x,diffMat->y,diffMat->z);
         pass.setUniform3f("AmbientMaterial",ambMat->x,ambMat->y,ambMat->z);
-        pass.setUniformMatrix4f("Modelview",cam.getModelViewMatrix());
-        pass.setUniformMatrix3f("NormalMatrix",ofMatrix3x3(0.1,0.5,1.0,0.1,0.,0.,0.,0.,0.));
+        pass.setUniformMatrix4f("Modelview",cam.getModelViewMatrix()*camdist);
+        ofMatrix3x3 norMat(0.1,-0.1,0.1,-0.1,0.,0.,0.,0.,0.);
+        pass.setUniformMatrix3f("NormalMatrix",norMat);
         pass.setUniform1f("TessLevelInner",levelInner);
         pass.setUniform1f("TessLevelOuter",levelOuter);
         pass.setUniformMatrix4f("Projection",cam.getProjectionMatrix());
