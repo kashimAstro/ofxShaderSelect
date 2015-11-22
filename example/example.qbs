@@ -13,10 +13,11 @@ Project{
 
         files: [
             'src/main.cpp',
+            'bin/data/shader.glsl',
         ]
 
         of.addons: [
-        'ofxGui','ofxShaderSelect'
+        'ofxGui','ofxShaderSelect','ofxAssimpModelLoader'
         ]
 
         // additional flags for the project. the of module sets some

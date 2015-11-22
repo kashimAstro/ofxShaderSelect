@@ -40,6 +40,7 @@ void main(){
 -- GEOMETRY 
 uniform mat4 Modelview;
 uniform mat3 NormalMatrix;
+
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 in vec3 tePosition[3];

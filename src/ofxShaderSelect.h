@@ -6,6 +6,7 @@ class ofxShaderSelect{
 	ofFile file;
 	string buffer;
 	vector<string> bufferShader;
+    vector<string> uniforms;
 	int counter;
 
 	string VERTEX      = "VERTEX";
@@ -24,6 +25,9 @@ class ofxShaderSelect{
                 vector<string> split = ofSplitString(source[i],"\n");
 				for(int j = 0; j < split.size(); j++) {
 					if( i == counter ) {
+                        std::size_t found = split[j].find("uniform");
+                        if (found!=std::string::npos)
+                            uniforms.push_back(split[j]);
                         buffer+=split[j]+"\n";
 					}
                 }
@@ -32,13 +36,20 @@ class ofxShaderSelect{
 			ofStringReplace(buffer, GEOMETRY,   "");
 			ofStringReplace(buffer, FRAGMENT,   "");
 			ofStringReplace(buffer, TESSCONTROL,"");
-			ofStringReplace(buffer, TESSEVAL,   "");
+			ofStringReplace(buffer, TESSEVAL,   "");            
 			bufferShader.push_back(buffer);
 			counter++;
 			buffer="";
         }
 		return bufferShader;
 	}
+
+    void setUniform(){
+        for(int i = 0; i < uniforms.size(); i++){
+                ofLog()<<uniforms[i];
+                //?
+        }
+    }
 
     ofShader active(vector<string> source, int version, GLenum input=GL_POINTS, GLenum output=GL_TRIANGLE_STRIP, int outputCount=60) {
         if(source.size()>=4) {

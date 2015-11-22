@@ -1,6 +1,7 @@
 #include "ofMain.h"
 #include "ofxShaderSelect.h"
 #include "ofxGui.h"
+#include "ofxAssimpModelLoader.h"
 
 class ofApp : public ofBaseApp{
 	public:
@@ -9,8 +10,7 @@ class ofApp : public ofBaseApp{
     ofShader pass;
     ofEasyCam cam;
     ofIcoSpherePrimitive ico;
-    ofSpherePrimitive sphere;
-    ofBoxPrimitive box;
+    ofxAssimpModelLoader assimp;
 
     ofVbo vbo;
     ofVec3f normals;
@@ -39,6 +39,8 @@ class ofApp : public ofBaseApp{
         ico.set(100,1);
         ofMesh m = ico.getMesh();
         vbo.setMesh(m,GL_DYNAMIC_DRAW);
+
+        shader.setUniform();
 	}
 
 	void update(){
@@ -47,11 +49,13 @@ class ofApp : public ofBaseApp{
 
 	void draw(){
         ofBackground(0,0,95);
+
         cam.begin();
         ofEnableDepthTest();
         pass.begin();
         ofMatrix4x4 camdist;
         camdist.preMultTranslate(ofVec3f(0,0,600));
+        camdist.preMultRotate(ofQuaternion(ofGetElapsedTimeMillis()*0.065,ofVec3f(0,0,1)));
 
         pass.setUniform3f("LightPosition",lightpos->x,lightpos->y,lightpos->z);
         pass.setUniform3f("DiffuseMaterial",diffMat->x,diffMat->y,diffMat->z);
@@ -76,6 +80,10 @@ class ofApp : public ofBaseApp{
         if(key == ' '){
             pass.printActiveAttributes();
             pass.printActiveUniforms();
+        }
+        if(key == 'a'){
+            assimp.loadModel("model.obj",true);
+            vbo.setMesh(assimp.getMesh(0),GL_DYNAMIC_DRAW);
         }
     }
 };
