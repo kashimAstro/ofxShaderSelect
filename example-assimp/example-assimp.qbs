@@ -12,9 +12,8 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
-            'src/main.cpp',
-            'bin/data/shader.glsl',
-            'bin/data/quads.glsl',
+            "src/main.cpp",
+            "bin/data/quads.glsl",
         ]
 
         of.addons: [
