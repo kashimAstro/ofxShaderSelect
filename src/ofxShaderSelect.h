@@ -14,6 +14,7 @@ class ofxShaderSelect{
 	string FRAGMENT    = "FRAGMENT";
 	string TESSCONTROL = "TESSCONTROL";
 	string TESSEVAL    = "TESSEVAL";
+    string FLATESSEVAL = "FLATTESSEVAL";
 
 	vector<string> load(string path){
 		bufferShader.clear();
@@ -36,7 +37,8 @@ class ofxShaderSelect{
 			ofStringReplace(buffer, GEOMETRY,   "");
 			ofStringReplace(buffer, FRAGMENT,   "");
 			ofStringReplace(buffer, TESSCONTROL,"");
-			ofStringReplace(buffer, TESSEVAL,   "");            
+            ofStringReplace(buffer, TESSEVAL,   "");
+
 			bufferShader.push_back(buffer);
 			counter++;
 			buffer="";
@@ -49,6 +51,12 @@ class ofxShaderSelect{
                 ofLog()<<uniforms[i];
                 //?
         }
+    }
+
+    ofMatrix3x3 mat4ToMat3(ofMatrix4x4 mat4) {
+         return ofMatrix3x3(mat4._mat[0][0], mat4._mat[0][1], mat4._mat[0][2],
+                            mat4._mat[1][0], mat4._mat[1][1], mat4._mat[1][2],
+                            mat4._mat[2][0], mat4._mat[2][1], mat4._mat[2][2]);
     }
 
     ofShader active(vector<string> source, int version, GLenum input=GL_POINTS, GLenum output=GL_TRIANGLE_STRIP, int outputCount=60) {

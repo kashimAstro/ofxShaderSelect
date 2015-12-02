@@ -14,6 +14,7 @@ Project{
         files: [
             'src/main.cpp',
             'bin/data/shader.glsl',
+            'bin/data/quads.glsl',
         ]
 
         of.addons: [

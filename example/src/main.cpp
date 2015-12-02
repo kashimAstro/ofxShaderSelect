@@ -1,7 +1,6 @@
 #include "ofMain.h"
 #include "ofxShaderSelect.h"
 #include "ofxGui.h"
-#include "ofxAssimpModelLoader.h"
 
 class ofApp : public ofBaseApp{
 	public:
@@ -10,7 +9,6 @@ class ofApp : public ofBaseApp{
     ofShader pass;
     ofEasyCam cam;
     ofIcoSpherePrimitive ico;
-    ofxAssimpModelLoader assimp;
 
     ofVbo vbo;
     ofVec3f normals;
@@ -20,10 +18,11 @@ class ofApp : public ofBaseApp{
     ofParameter<ofVec3f> lightpos;
     ofParameter<ofVec3f> diffMat;
     ofParameter<ofVec3f> ambMat;
+    bool stopRotate;
 
 	void setup(){
         ofSetVerticalSync(false);
-		vector<string> shaders = shader.load("shader.glsl");
+        vector<string> shaders = shader.load("shader.glsl");
         pass = shader.active(shaders,440);
 
         gui.setup();
@@ -40,7 +39,7 @@ class ofApp : public ofBaseApp{
         ofMesh m = ico.getMesh();
         vbo.setMesh(m,GL_DYNAMIC_DRAW);
 
-        shader.setUniform();
+        shader.setUniform();//Test ???
 	}
 
 	void update(){
@@ -48,26 +47,28 @@ class ofApp : public ofBaseApp{
 	}
 
 	void draw(){
-        ofBackground(0,0,95);
+        ofBackgroundGradient(ofColor(200),ofColor(0,0,65));
 
         cam.begin();
         ofEnableDepthTest();
         pass.begin();
-        ofMatrix4x4 camdist;
-        camdist.preMultTranslate(ofVec3f(0,0,600));
-        camdist.preMultRotate(ofQuaternion(ofGetElapsedTimeMillis()*0.065,ofVec3f(0,0,1)));
 
+        ofMatrix4x4 camdist;
+
+        camdist.preMultTranslate(ofVec3f(0,0,600));
+        if(!stopRotate)
+            camdist.preMultRotate(ofQuaternion(ofGetElapsedTimeMillis()*0.065,ofVec3f(0,0,1)));
+
+        pass.setUniformMatrix4f("Modelview",cam.getModelViewMatrix()*camdist);
+        pass.setUniformMatrix4f("Projection",cam.getProjectionMatrix());
+        pass.setUniformMatrix3f("NormalMatrix",shader.mat4ToMat3(ofGetCurrentNormalMatrix()));
+        pass.setUniform1f("TessLevelInner",levelInner);
+        pass.setUniform1f("TessLevelOuter",levelOuter);
         pass.setUniform3f("LightPosition",lightpos->x,lightpos->y,lightpos->z);
         pass.setUniform3f("DiffuseMaterial",diffMat->x,diffMat->y,diffMat->z);
         pass.setUniform3f("AmbientMaterial",ambMat->x,ambMat->y,ambMat->z);
-        pass.setUniformMatrix4f("Modelview",cam.getModelViewMatrix()*camdist);
-        ofMatrix3x3 norMat(0.1,-0.1,0.1,-0.1,0.,0.,0.,0.,0.);
-        pass.setUniformMatrix3f("NormalMatrix",norMat);
-        pass.setUniform1f("TessLevelInner",levelInner);
-        pass.setUniform1f("TessLevelOuter",levelOuter);
-        pass.setUniformMatrix4f("Projection",cam.getProjectionMatrix());
 
-            vbo.drawElements(GL_PATCHES, vbo.getNumVertices()*vbo.getNumVertices());
+                vbo.drawElements(GL_PATCHES, vbo.getNumVertices()*vbo.getNumVertices());
 
         pass.end();
         ofDisableDepthTest();
@@ -81,9 +82,8 @@ class ofApp : public ofBaseApp{
             pass.printActiveAttributes();
             pass.printActiveUniforms();
         }
-        if(key == 'a'){
-            assimp.loadModel("model.obj",true);
-            vbo.setMesh(assimp.getMesh(0),GL_DYNAMIC_DRAW);
+        if(key == 'd'){
+            stopRotate=!stopRotate;
         }
     }
 };
